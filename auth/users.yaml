@@ -1,0 +1,29 @@
+cookie_expiry_days: 30
+cookie_key: M0Bd3CAh5Er6wIWrbTVp9AO3Efmgd/vSipCfd0AH4H8= # Must be a string
+cookie_name: ULdecorationist ULheliogram
+credentials:
+    usernames:
+        me:
+            email: gnohead@gmail.com
+            failed_login_attempts: 0 # Will be managed automatically
+            first_name: gnohead
+            last_name: min
+            logged_in: False # Will be managed automatically
+            password: Mack@#93287! # Will be hashed automatically
+            roles: # Optional
+            - admin
+            - editor
+            - viewer
+    oauth2: # Optional
+        google: # Follow instructions: https://developers.google.com/identity/protocols/oauth2
+            client_id: # To be filled
+            client_secret: # To be filled
+            redirect_uri: # URL to redirect to after OAuth2 authentication
+        microsoft: # Follow instructions: https://learn.microsoft.com/en-us/graph/auth-register-app-v2
+            client_id: # To be filled
+            client_secret: # To be filled
+            redirect_uri: # URL to redirect to after OAuth2 authentication
+            tenant_id: # To be filled
+    pre-authorized: # Optional
+        emails:
+        - nothing@none.com
