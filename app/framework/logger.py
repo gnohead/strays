@@ -72,7 +72,7 @@ def get_loggers() -> Tuple[Callable]:
     
     configs = load_configurations()
     logpath = configs.path.log
-    appname = configs.attributes.name
+    appname = configs.attributes.appname
 
     # 로거 오브젝트 생성
     log_printer = create_logger(logpath, appname)

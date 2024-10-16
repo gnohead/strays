@@ -3,7 +3,8 @@
 
 #
 # Author: gnohead
-# Created on: 2024. 5.
+# Created: 2024. 5.
+# Modified: 2024. 10.
 #
 
 """
@@ -12,7 +13,7 @@ tools
 - 프로그램 제작에 필요한 도구들을 모아놓은 모듈
 """
 
-import os, sys
+import os
 import uuid
 import hashlib
 import random
@@ -25,9 +26,17 @@ from pathlib import Path
 from dotenv import dotenv_values
 from datetime import datetime, timedelta
 from pytz import timezone
-from typing import List, Any, Union, Tuple
+from typing import List, Any, Tuple
 
-ROOT = lambda pt: Path(os.path.commonpath([sys.executable, __file__])).joinpath(pt).resolve().as_posix()
+
+def add_environments(envfile:str):
+    envvars = dotenv_values(envfile)
+    for k, v in envvars.items():
+        if k in os.environ.keys():
+            continue
+        else:
+            os.environ[k] = v
+            print(f"env init> {k}={v}")
 
 
 def get_git_branch() -> str:
@@ -37,42 +46,24 @@ def get_git_branch() -> str:
     current_branch = result.stdout.strip()
     return current_branch
 
+
 def is_dev() -> bool:
     return "dev" == get_git_branch()
-
-
-def initialize_environments():
-    env_conf = ROOT("env_dev.conf") if is_dev() else ROOT("env_rel.conf")
-    envvars = dotenv_values(env_conf)
-    for k, v in envvars.items():
-        if k in os.environ.keys():
-            continue
-        else:
-            os.environ[k] = v
-            print(f"env init> {k}={v}")
 
 
 def gen_uuid():
     return uuid.uuid4()
 
 
-def create_cmai_key():
-    return f"cmai-{gen_uuid()}".lower()
-
-
 def hash_uuid():
     # UUID 생성
     uuid_obj = uuid.uuid4()
-
     # UUID를 문자열로 변환
     uuid_str = str(uuid_obj)
-
     # SHA-256 해시 생성
     sha256_hash = hashlib.sha256(uuid_str.encode())
-
     # 해시를 16진수 문자열로 변환
     hash_str = sha256_hash.hexdigest()
-
     return hash_str
 
 
@@ -166,8 +157,6 @@ def get_date_interval(after_days:int, date_format:str="%Y-%m-%d") -> Tuple[str, 
 def unittest():
     uuid = gen_uuid()
     print(uuid)
-    cmaikey = create_cmai_key()
-    print(cmaikey)
 
     unique_key = gen_key()
     print(unique_key)
@@ -180,6 +169,8 @@ def unittest2():
     print(branch_name)
 
 if __name__ == "__main__":
-    # unittest()
+    from __init__ import print
+
+    unittest()
     unittest2()
     print("done.")
