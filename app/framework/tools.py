@@ -26,8 +26,13 @@ from pathlib import Path
 from dotenv import dotenv_values
 from datetime import datetime, timedelta
 from pytz import timezone
-from typing import List, Any, Tuple
+from pydantic import create_model, BaseModel
 
+from typing import List, Any, Tuple, Dict
+ 
+def create_model_from_data(name:str, data:Dict[str, Any]) -> BaseModel:
+    NewModel = create_model(name, **{key: (type(value), ...) for key, value in data.items()})
+    return NewModel(**data)
 
 def add_environments(envfile:str):
     envvars = dotenv_values(envfile)
