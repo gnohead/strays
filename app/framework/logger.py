@@ -81,8 +81,9 @@ def get_loggers() -> Tuple[Callable]:
     # 호출한 파일의 정보를 얻음
     caller_frame = inspect.stack(1)
     
-    print = lambda obj: log_printer.info(f"({Path(caller_frame[-1].filename).name}) {obj}")
-    error = lambda obj: log_printer.error(f"({Path(caller_frame[-1].filename).name}) {obj}")
+    print = lambda obj: log_printer.info(obj)
+    error = lambda obj: log_printer.error(obj, stack_info=True)
+    dbg_print = lambda obj: log_printer.debug(f"({Path(caller_frame[-1].filename).name}) {obj}")
 
     return (print, error)
 
