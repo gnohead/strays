@@ -15,6 +15,7 @@ logger
 """
 
 import logging
+import inspect
 
 from datetime import datetime
 from logging.handlers import RotatingFileHandler
@@ -77,8 +78,11 @@ def get_loggers() -> Tuple[Callable]:
     # 로거 오브젝트 생성
     log_printer = create_logger(logpath, appname)
 
-    print = lambda obj: log_printer.info(obj)
-    error = lambda obj: log_printer.error(obj)
+    # 호출한 파일의 정보를 얻음
+    caller_frame = inspect.stack(1)
+    
+    print = lambda obj: log_printer.info(f"({Path(caller_frame[-1].filename).name}) {obj}")
+    error = lambda obj: log_printer.error(f"({Path(caller_frame[-1].filename).name}) {obj}")
 
     return (print, error)
 

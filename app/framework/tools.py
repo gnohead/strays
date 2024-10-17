@@ -150,6 +150,53 @@ def get_date_interval(after_days:int, date_format:str="%Y-%m-%d") -> Tuple[str, 
     return (begin, end)
 
 
+def shift_alphabet(text):
+    result = []
+    
+    for char in text:
+        # 소문자일 경우
+        if 'a' <= char <= 'z':
+            # z일 경우 a로
+            new_char = chr((ord(char) - ord('a') + 1) % 26 + ord('a'))
+        # 대문자일 경우
+        elif 'A' <= char <= 'Z':
+            # Z일 경우 A로
+            new_char = chr((ord(char) - ord('A') + 1) % 26 + ord('A'))
+        # 숫자일 경우
+        elif '0' <= char <= '9':
+            new_char = chr((ord(char) - ord('0') + 1) % 10 + ord('0'))        
+        else:
+            # 알파벳이 아닌 경우 그대로 유지
+            new_char = char
+        
+        result.append(new_char)
+    
+    return ''.join(result)
+
+
+def restore_alphabet(text):
+    result = []
+    
+    for char in text:
+        # 소문자일 경우
+        if 'a' <= char <= 'z':
+            # a일 경우 z로
+            new_char = chr((ord(char) - ord('a') - 1) % 26 + ord('a'))
+        # 대문자일 경우
+        elif 'A' <= char <= 'Z':
+            # A일 경우 Z로
+            new_char = chr((ord(char) - ord('A') - 1) % 26 + ord('A'))
+        # 숫자일 경우
+        elif '0' <= char <= '9':
+            new_char = chr((ord(char) - ord('0') - 1) % 10 + ord('0'))        
+        else:
+            # 알파벳이 아닌 경우 그대로 유지
+            new_char = char
+        
+        result.append(new_char)
+    
+    return ''.join(result)
+
 
 #
 # unittest
