@@ -82,8 +82,7 @@ def get_loggers() -> Tuple[Callable]:
     caller_frame = inspect.stack(1)
     
     print = lambda obj: log_printer.info(obj)
-    error = lambda obj: log_printer.error(obj, stack_info=True)
-    dbg_print = lambda obj: log_printer.debug(f"({Path(caller_frame[-1].filename).name}) {obj}")
+    error = lambda obj: log_printer.error(obj)
 
     return (print, error)
 

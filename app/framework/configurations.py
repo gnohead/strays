@@ -23,7 +23,6 @@ from roots import Path, ROOT, ROOT_APPDATA
 #
 class AppPaths(BaseModel):
     log: str
-    secrets:str
 
 class AppAttributes(BaseModel):
     appname: str

@@ -13,12 +13,13 @@ if _path not in sys.path:
 from logger import get_loggers
 print, error = get_loggers()
 
-from roots import ROOT
+from roots import ROOT, Path
 import tools
 
 __all__ = [
     "print",
     "error",
+    "Path",
     "ROOT",
     "tools"
 ]
