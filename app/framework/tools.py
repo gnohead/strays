@@ -21,6 +21,7 @@ import shutil
 import zipfile
 import pickle
 import subprocess
+import json
 
 from pathlib import Path
 from dotenv import dotenv_values
@@ -33,6 +34,11 @@ from pydantic import create_model, BaseModel
 def create_model_from_data(name:str, data:Dict[str, Any]) -> BaseModel:
     NewModel = create_model(name, **{key: (type(value), ...) for key, value in data.items()})
     return NewModel(**data)
+
+
+def load_json(filepath:Path) -> BaseModel:
+    with open(filepath, "r", encoding="utf-8") as fp:
+        return create_model_from_data(filepath.stem, json.load(fp))
 
 
 def add_environments(envfile:str):
