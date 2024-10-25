@@ -3,23 +3,21 @@
 #
 # Author: gnohead
 # Created: 2024. 10.
+# Modified: 2024. 10.
 # 
 
-import os, sys
-_path = os.path.dirname(os.path.abspath(__file__))
-if _path not in sys.path:
-    sys.path.append(_path)
+from .roots import ROOT, Path
+from .logger import get_loggers
+from . import tools
+from . import time_and_date
 
-from logger import get_loggers
 print, error = get_loggers()
-
-from roots import ROOT, Path
-import tools
 
 __all__ = [
     "print",
     "error",
     "Path",
     "ROOT",
-    "tools"
+    "tools",
+    "time_and_date"
 ]

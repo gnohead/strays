@@ -69,7 +69,7 @@ def create_logger(logfolderpath:str, name:str):
 
 
 def get_loggers() -> Tuple[Callable]:
-    from configurations import load
+    from .configurations import load
     
     configs = load()
     logpath = configs.path.log
