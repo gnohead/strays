@@ -294,7 +294,8 @@ async def unittest2():
     server = Server()
     client = Client()
 
-    loop, server_task, client_task = await setup_server_and_client(server, client)
+    loop_server, server_task = await setup_socket(server)
+    loop_client, client_task = await setup_socket(client)
 
     await asyncio.sleep(1)
 
