@@ -143,7 +143,7 @@ def get_now(fmt: str = "%Y-%m-%d %H:%M:%S.%f", ofs: int = 3) -> str:
     return gen_timestamp(fmt)[-ofs]
 
 
-def get_date_interval(after_days: int, date_format: str = "%Y%m-%d") -> Tuple[str, str]:
+def get_date_interval(after_days: int, date_format: str = "%Y%m%d") -> Tuple[str, str]:
     """
     지정된 일수 전후의 날짜를 반환
 

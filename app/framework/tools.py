@@ -149,17 +149,6 @@ def gen_key(length: int = 64) -> str:
     return ''.join(random.choice(output_str) for _ in range(length))
 
 
-def gen_timestamp() -> str:
-    """
-    현재 시간을 'Asia/Seoul' 타임존 기준으로 타임스탬프 문자열로 반환합니다.
-
-    Returns:
-        str: 타임스탬프 문자열
-    """
-    tz = timezone('Asia/Seoul')
-    return datetime.now(tz).strftime("%Y%m%d%H%M%S%f")
-
-
 def remove_oldest_files(dirpath: str, prefix: str, type: str, remaining_count: int):
     """
     지정된 디렉토리에서 가장 오래된 파일들을 삭제하여 남은 파일의 수를 유지합니다.
@@ -259,25 +248,6 @@ def import_from_pickle(filepath: str) -> Any:
         return pickle.load(fp)
 
 
-def get_date_interval(after_days: int, date_format: str="%Y-%m-%d") -> Tuple[str, str]:
-    """
-    주어진 일수 후의 날짜 범위를 반환합니다.
-
-    Parameters:
-        after_days (int): 기준 날짜로부터의 일수
-        date_format (str, optional): 날짜 형식. 기본값은 "%Y-%m-%d"입니다.
-
-    Returns:
-        Tuple[str, str]: 시작 날짜와 종료 날짜
-    """
-    today = datetime.today()
-
-    end = today.strftime(date_format)
-    begin = (today - timedelta(days=after_days)).strftime(date_format)
-    
-    return (begin, end)
-
-
 class AlphabetCoder:
     """
     알파벳과 숫자를 인코딩/디코딩하는 클래스입니다.
@@ -364,9 +334,6 @@ def unittest():
 
     unique_key = gen_key()
     print(unique_key)
-
-    ts = gen_timestamp()
-    print(ts)
 
     # AlphabetCoder 테스트
     encoded = AlphabetCoder.encode("Hello123")
