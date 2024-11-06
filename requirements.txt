@@ -1,4 +1,1 @@
-python-dotenv
-pytz
-pydantic
-websockets
+-r ./app/framework/framework_requirements.txt
