@@ -59,7 +59,7 @@ class Socket(object):
             self.connected = False
             print("Disconnected")
 
-    async def send_message(self, message:Union[str, Dict], timeout:Optional[int]=None):
+    async def send(self, message:Union[str, Dict], timeout:Optional[float]=None):
         """
         서버로 메시지를 전송
 
@@ -74,7 +74,7 @@ class Socket(object):
         else:
             print("Not connected")
 
-    async def receive_message(self, timeout:Optional[int]=None):
+    async def receive(self, timeout:Optional[float]=None):
         """
         서버로부터 메시지를 수신
 
@@ -136,6 +136,24 @@ class Socket(object):
     async def start(self, *args, **kwargs):
         pass
 
+    def __aiter__(self):
+        """
+        비동기 이터레이터를 반환
+        """
+        return self
+
+    async def __anext__(self):
+        """
+        비동기 이터레이터의 다음 항목을 반환
+        """
+        if not self.connected:
+            raise StopAsyncIteration
+
+        message = await self.receive(timeout=1.0)
+        if message is None:
+            raise StopAsyncIteration
+
+        return message
 
 
 class Server(Socket):
@@ -180,7 +198,7 @@ class Server(Socket):
             async for message in websocket:
                 print(f"Received message: {message}")
                 response = self.message_handler(message)
-                await self.send_message(response)
+                await self.send(response)
 
         except Exception as e:
             await self.handle_error(e)
@@ -237,23 +255,23 @@ class Client(Socket):
         """
         await super().connect(self.uri, extra_headers=extra_headers)
 
-    async def send_message(self, message:Union[str, Dict], timeout:Optional[int]=None):
+    async def send(self, message:Union[str, Dict], timeout:Optional[int]=None):
         """
         서버로 메시지를 전송
 
         :param message: 전송할 메시지
         :param timeout: 타임아웃 시간 (초)
         """
-        await super().send_message(message, timeout)
+        await super().send(message, timeout)
 
-    async def receive_message(self, timeout:Optional[int]=None):
+    async def receive(self, timeout:Optional[int]=None):
         """
         서버로부터 메시지를 수신
 
         :param timeout: 타임아웃 시간 (초)
         :return: 수신한 메시지
         """
-        response = await super().receive_message(timeout)
+        response = await super().receive(timeout)
 
         if response:
             print(f"Received from server: {response}")
@@ -294,10 +312,10 @@ async def unittest():
 
     await asyncio.sleep(1)
 
-    await client.send_message("hello!!")
+    await client.send("hello!!")
     await asyncio.sleep(1)
     
-    res = await client.receive_message()
+    res = await client.receive()
     print(res)
     
     await client.disconnect()
@@ -322,8 +340,8 @@ async def unittest2():
         message = input("Enter message to send to server (or 'exit' to quit): ")
         if message.lower() == 'exit':
             break
-        await client.send_message({"message": message})
-        await client.receive_message()
+        await client.send({"message": message})
+        await client.receive()
 
     await client.disconnect()
     server_task.cancel()
