@@ -3,7 +3,6 @@
 
 import websockets as wss
 import asyncio
-import json
 import signal
 import sys
 from abc import abstractmethod
@@ -59,7 +58,7 @@ class Socket(object):
             self.connected = False
             print("Disconnected")
 
-    async def send(self, message:Union[str, Dict], timeout:Optional[float]=None):
+    async def send(self, message:Union[str, bytes], timeout:Optional[float]=None):
         """
         서버로 메시지를 전송
 
@@ -68,7 +67,7 @@ class Socket(object):
         """
         if self.connected:
             try:
-                await asyncio.wait_for(self.websocket.send(json.dumps(message)), timeout)
+                await asyncio.wait_for(self.websocket.send(message), timeout)
             except asyncio.TimeoutError:
                 print("Send message timed out")
         else:
@@ -79,12 +78,11 @@ class Socket(object):
         서버로부터 메시지를 수신
 
         :param timeout: 타임아웃 시간 (초)
-        :return: 수신한 메시지 (JSON 형식)
+        :return: 수신한 메시지
         """
         if self.connected:
             try:
-                message = await asyncio.wait_for(self.websocket.recv(), timeout)
-                return json.loads(message)
+                return await asyncio.wait_for(self.websocket.recv(), timeout)
             except asyncio.TimeoutError:
                 print("Receive message timed out")
                 return None
@@ -207,14 +205,15 @@ class Server(Socket):
             self.connected = False
             self.websocket = None  # 연결 종료 시 websocket 해제
 
-    def default_message_handler(self, message:str) -> Dict[str, str]:
+    def default_message_handler(self, message:str) -> bytes:
         """
         기본 메시지 핸들러
 
         :param message: 수신한 메시지
         :return: 처리된 메시지
         """
-        return {"processed": message.upper()}
+        import json
+        return json.dumps({"processed": message.upper()}).encode(encoding="utf-8")
 
     async def start(self):
         """
@@ -255,7 +254,7 @@ class Client(Socket):
         """
         await super().connect(self.uri, extra_headers=extra_headers)
 
-    async def send(self, message:Union[str, Dict], timeout:Optional[int]=None):
+    async def send(self, message:str, timeout:Optional[int]=None):
         """
         서버로 메시지를 전송
 
@@ -292,14 +291,15 @@ async def unittest():
     """
     유닛 테스트 함수
     """
-    def custom_message_handler(message:str) -> Dict[str, str]:
+    def custom_message_handler(message:str) -> bytes:
         """
         사용자 정의 메시지 핸들러
 
         :param message: 수신한 메시지
         :return: 처리된 메시지
         """
-        return {"custom_processed": message[::-1]}
+        import json
+        return json.dumps({"custom_processed": message.upper()}).encode(encoding="utf-8")
 
     server = Server()
     client = Client(uri="ws://localhost:8765")
@@ -340,7 +340,7 @@ async def unittest2():
         message = input("Enter message to send to server (or 'exit' to quit): ")
         if message.lower() == 'exit':
             break
-        await client.send({"message": message})
+        await client.send(message)
         await client.receive()
 
     await client.disconnect()
