@@ -1,6 +1,12 @@
 #!python3
 #-*- coding: utf-8 -*-
 
+#
+# Author: gnohead
+# Created: 2024. 10.
+# Modified: 2024. 11.
+#
+
 import websockets as wss
 import asyncio
 import signal
