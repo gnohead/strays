@@ -1,4 +1,4 @@
 python-dotenv
 pytz
 pydantic
-
+websockets

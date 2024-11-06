@@ -11,6 +11,7 @@ from .logger import get_loggers
 from . import tools
 from .tools import load_json
 from . import time_and_date
+from . import sockets
 
 print, error = get_loggers()
 
@@ -21,5 +22,6 @@ __all__ = [
     "ROOT",
     "tools",
     "time_and_date",
-    "load_json"
+    "load_json",
+    "sockets"
 ]
