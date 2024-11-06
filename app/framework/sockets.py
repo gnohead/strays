@@ -6,6 +6,7 @@ import asyncio
 import json
 import signal
 import sys
+from abc import abstractmethod
 
 from typing import Union, Dict, Optional
 
@@ -125,6 +126,11 @@ class Socket(object):
         task = loop.create_task(self.start(*args, **kwargs))
 
         return loop, task
+    
+    @abstractmethod
+    async def start(self, *args, **kwargs):
+        pass
+
 
 
 class Server(Socket):
