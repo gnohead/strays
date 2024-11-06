@@ -66,7 +66,6 @@ class Socket(object):
         """
         if self.connected:
             await self.websocket.send(json.dumps(message))
-
         else:
             print("Not connected")
 
@@ -84,6 +83,11 @@ class Socket(object):
             except wss.ConnectionClosedOK:
                 print("Connection closed normally")
                 return None
+            
+            except Exception as e:
+                await self.handle_error(e)
+                return None
+            
         else:
             print("Not connected")
 
@@ -94,6 +98,33 @@ class Socket(object):
         :param error: 발생한 오류
         """
         print(f"Error: {error}")
+
+    async def setup(self, *args, **kwargs) -> tuple:
+        """
+        소켓을 설정
+
+        :param args: start 메서드에 전달할 위치 인수
+        :param kwargs: start 메서드에 전달할 키워드 인수
+        :return: 이벤트 루프, 소켓 태스크
+        """
+        loop = asyncio.get_running_loop()
+
+        async def shutdown():
+            """
+            종료 처리
+            """
+            print("Shutting down...")
+            if isinstance(self, (Server, Client)):
+                await self.stop()
+                
+            loop.stop()
+
+        for sig in (signal.SIGINT, signal.SIGTERM):
+            loop.add_signal_handler(sig, lambda: asyncio.create_task(shutdown()))
+
+        task = loop.create_task(self.start(*args, **kwargs))
+
+        return loop, task
 
 
 class Server(Socket):
@@ -223,32 +254,6 @@ class Client(Socket):
         await self.connect()
 
 
-async def setup_socket(socket:Union[Server, Client]) -> tuple:
-    """
-    소켓을 설정
-
-    :param socket: Server 또는 Client 객체
-    :return: 이벤트 루프, 소켓 태스크
-    """
-    loop = asyncio.get_event_loop()
-
-    def shutdown():
-        """
-        종료 처리
-        """
-        print("Shutting down...")
-        if isinstance(socket, Server):
-            loop.create_task(socket.stop())
-        loop.stop()
-
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(sig, shutdown)
-
-    task = loop.create_task(socket.start())
-
-    return loop, task
-
-
 #
 # for unittest
 #
@@ -268,8 +273,8 @@ async def unittest():
     server = Server()
     client = Client(uri="ws://localhost:8765")
 
-    loop_server, server_task = await setup_socket(server)
-    loop_client, client_task = await setup_socket(client)
+    loop_server, server_task = await server.setup()
+    loop_client, client_task = await client.setup()
 
     await asyncio.sleep(1)
     server.set_message_handler(custom_message_handler)
@@ -295,8 +300,8 @@ async def unittest2():
     server = Server()
     client = Client(uri="ws://localhost:8765")
 
-    loop_server, server_task = await setup_socket(server)
-    loop_client, client_task = await setup_socket(client)
+    loop_server, server_task = await server.setup()
+    loop_client, client_task = await client.setup()
 
     await asyncio.sleep(1)
 
