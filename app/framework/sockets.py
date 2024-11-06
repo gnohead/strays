@@ -7,6 +7,8 @@ import json
 import signal
 import sys
 
+from typing import Union
+
 class Socket(object):
     """
     웹소켓 연결을 관리하는 기본 클래스
@@ -220,13 +222,12 @@ class Client(Socket):
         await self.connect()
 
 
-async def setup_server_and_client(server, client):
+async def setup_socket(socket: Union[Server, Client]):
     """
-    서버와 클라이언트를 설정
+    소켓을 설정
 
-    :param server: Server 객체
-    :param client: Client 객체
-    :return: 이벤트 루프, 서버 태스크, 클라이언트 태스크
+    :param socket: Server 또는 Client 객체
+    :return: 이벤트 루프, 소켓 태스크
     """
     loop = asyncio.get_event_loop()
 
@@ -235,16 +236,16 @@ async def setup_server_and_client(server, client):
         종료 처리
         """
         print("Shutting down...")
-        loop.create_task(server.stop())
+        if isinstance(socket, Server):
+            loop.create_task(socket.stop())
         loop.stop()
 
     for sig in (signal.SIGINT, signal.SIGTERM):
         loop.add_signal_handler(sig, shutdown)
 
-    server_task = loop.create_task(server.start())
-    client_task = loop.create_task(client.start())
+    task = loop.create_task(socket.start())
 
-    return loop, server_task, client_task
+    return loop, task
 
 
 #
@@ -266,7 +267,8 @@ async def unittest():
     server = Server()
     client = Client()
 
-    loop, server_task, client_task = await setup_server_and_client(server, client)
+    loop_server, server_task = await setup_socket(server)
+    loop_client, client_task = await setup_socket(client)
 
     await asyncio.sleep(1)
     server.set_message_handler(custom_message_handler)
@@ -278,7 +280,8 @@ async def unittest():
     
     res = await client.receive_message()
     print(res)
-    await client_task
+    
+    await client.disconnect()
     server_task.cancel()
 
     print("done.")
