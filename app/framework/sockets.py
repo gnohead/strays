@@ -253,11 +253,11 @@ class Client(Socket):
             
         return response
 
-    async def start(self):
+    async def start(self, extra_headers:Optional[Dict[str, str]]=None):
         """
         클라이언트를 시작
         """
-        await self.connect()
+        await self.connect(extra_headers=extra_headers)
 
 
 #
