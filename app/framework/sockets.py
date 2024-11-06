@@ -189,11 +189,11 @@ class Client(Socket):
         super().__init__(max_retries, retry_delay)
         self.uri = uri
 
-    async def connect(self):
+    async def connect(self, extra_headers:Optional[Dict[str, str]]=None):
         """
         서버에 연결
         """
-        await super().connect(self.uri)
+        await super().connect(self.uri, extra_headers=extra_headers)
 
     async def send_message(self, message:Union[str, Dict]):
         """
