@@ -11,7 +11,7 @@ from typing import Union, Dict, Optional
 
 class Socket(object):
     """
-    웹소켓 연결을 관리하는 기본 클래스
+    WebSocket 연결을 관리하는 기본 클래스
     """
 
     def __init__(self, max_retries:int=5, retry_delay:int=2):
@@ -27,7 +27,7 @@ class Socket(object):
 
     async def connect(self, uri:str, extra_headers:Optional[Dict[str, str]]=None):
         """
-        서버에 연결을 시도
+        서버에 연결을 시도합니다.
 
         :param uri: 서버 URI
         :param extra_headers: 추가 헤더
@@ -51,7 +51,7 @@ class Socket(object):
 
     async def disconnect(self):
         """
-        서버와의 연결을 종료
+        서버와의 연결을 종료합니다.
         """
         if self.connected:
             await self.websocket.close()
@@ -60,7 +60,7 @@ class Socket(object):
 
     async def send(self, message:Union[str, bytes], timeout:Optional[float]=None):
         """
-        서버로 메시지를 전송
+        서버로 메시지를 전송합니다.
 
         :param message: 전송할 메시지
         :param timeout: 타임아웃 시간 (초)
@@ -75,7 +75,7 @@ class Socket(object):
 
     async def receive(self, timeout:Optional[float]=None):
         """
-        서버로부터 메시지를 수신
+        서버로부터 메시지를 수신합니다.
 
         :param timeout: 타임아웃 시간 (초)
         :return: 수신한 메시지
@@ -97,7 +97,7 @@ class Socket(object):
 
     async def handle_error(self, error:Exception):
         """
-        오류를 처리
+        오류를 처리합니다.
 
         :param error: 발생한 오류
         """
@@ -105,7 +105,7 @@ class Socket(object):
 
     async def setup(self, *args, **kwargs) -> tuple:
         """
-        소켓을 설정
+        소켓을 설정합니다.
 
         :param args: start 메서드에 전달할 위치 인수
         :param kwargs: start 메서드에 전달할 키워드 인수
@@ -136,13 +136,13 @@ class Socket(object):
 
     def __aiter__(self):
         """
-        비동기 이터레이터를 반환
+        비동기 이터레이터를 반환합니다.
         """
         return self
 
     async def __anext__(self):
         """
-        비동기 이터레이터의 다음 항목을 반환
+        비동기 이터레이터의 다음 항목을 반환합니다.
         """
         if not self.connected:
             raise StopAsyncIteration
@@ -156,7 +156,7 @@ class Socket(object):
 
 class Server(Socket):
     """
-    웹소켓 서버를 관리하는 클래스
+    WebSocket 서버를 관리하는 클래스
     """
 
     def __init__(self, host:str="localhost", port:int=8765, max_retries:int=5, retry_delay:int=2, message_handler:Optional[callable]=None):
@@ -176,7 +176,7 @@ class Server(Socket):
 
     def set_message_handler(self, message_handler:callable):
         """
-        사용자 정의 메시지 핸들러를 설정
+        사용자 정의 메시지 핸들러를 설정합니다.
 
         :param message_handler: 사용자 정의 메시지 핸들러 함수
         """
@@ -184,7 +184,7 @@ class Server(Socket):
 
     async def process(self, websocket:wss.WebSocketServerProtocol, path:str):
         """
-        클라이언트로부터 메시지를 처리
+        클라이언트로부터 메시지를 처리합니다.
 
         :param websocket: 웹소켓 객체
         :param path: 요청 경로
@@ -217,7 +217,7 @@ class Server(Socket):
 
     async def start(self):
         """
-        서버를 시작
+        서버를 시작합니다.
         """
         self.server = await wss.serve(self.process, self.host, self.port)
         print(f"Server started on ws://{self.host}:{self.port}")
@@ -225,7 +225,7 @@ class Server(Socket):
 
     async def stop(self):
         """
-        서버를 종료
+        서버를 종료합니다.
         """
         self.server.close()
         await self.server.wait_closed()
@@ -234,7 +234,7 @@ class Server(Socket):
 
 class Client(Socket):
     """
-    웹소켓 클라이언트를 관리하는 클래스
+    WebSocket 클라이언트를 관리하는 클래스
     """
 
     def __init__(self, uri:str, max_retries:int=5, retry_delay:int=2):
@@ -250,13 +250,13 @@ class Client(Socket):
 
     async def connect(self, extra_headers:Optional[Dict[str, str]]=None):
         """
-        서버에 연결
+        서버에 연결합니다.
         """
         await super().connect(self.uri, extra_headers=extra_headers)
 
     async def send(self, message:str, timeout:Optional[int]=None):
         """
-        서버로 메시지를 전송
+        서버로 메시지를 전송합니다.
 
         :param message: 전송할 메시지
         :param timeout: 타임아웃 시간 (초)
@@ -265,7 +265,7 @@ class Client(Socket):
 
     async def receive(self, timeout:Optional[int]=None):
         """
-        서버로부터 메시지를 수신
+        서버로부터 메시지를 수신합니다.
 
         :param timeout: 타임아웃 시간 (초)
         :return: 수신한 메시지
@@ -279,7 +279,7 @@ class Client(Socket):
 
     async def start(self, extra_headers:Optional[Dict[str, str]]=None):
         """
-        클라이언트를 시작
+        클라이언트를 시작합니다.
         """
         await self.connect(extra_headers=extra_headers)
 
