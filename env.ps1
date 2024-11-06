@@ -29,6 +29,7 @@ function New-Environment {
         # 패키지 실행 환경 설정
         if ($LASTEXITCODE -eq 0) {
             Invoke-Expression "$venvpath\Scripts\activate.ps1"
+            & $env:PYTHONPATH = (Get-Location).Path
             & python -m pip install pip --upgrade
 
             # requirements.txt 파일이 존재하면 패키지 설치
@@ -65,18 +66,21 @@ function Remove-Environment {
 function Enable-Environment {
     # 파이썬 환경에 진입
     Invoke-Expression "$venvpath\Scripts\activate.ps1"
+    & $env:PYTHONPATH = (Get-Location).Path
 }
 
 function Invoke-Command {
     param($commandArgs)
     # 특정 명령어를 파이썬 환경에서 실행
     Invoke-Expression "$venvpath\Scripts\activate.ps1"
+    & $env:PYTHONPATH = (Get-Location).Path
     & Invoke-Expression "$commandArgs"
     & deactivate
 }
 
 function Update-Requirements {
     Invoke-Expression "$venvpath\Scripts\activate.ps1"
+    & $env:PYTHONPATH = (Get-Location).Path
     & python -m pip install --upgrade pip
     if (Test-Path $reqfile) {
         & python -m pip install -r $reqfile
