@@ -7,14 +7,14 @@ import json
 import signal
 import sys
 
-from typing import Union
+from typing import Union, Dict, Optional
 
 class Socket(object):
     """
     웹소켓 연결을 관리하는 기본 클래스
     """
 
-    def __init__(self, max_retries=5, retry_delay=2):
+    def __init__(self, max_retries:int=5, retry_delay:int=2):
         """
         Socket 클래스의 생성자
 
@@ -25,17 +25,18 @@ class Socket(object):
         self.max_retries = max_retries
         self.retry_delay = retry_delay
 
-    async def connect(self, uri):
+    async def connect(self, uri:str, extra_headers:Optional[Dict[str, str]]=None):
         """
         서버에 연결을 시도
 
         :param uri: 서버 URI
+        :param extra_headers: 추가 헤더
         """
         retries = 0
 
         while retries < self.max_retries:
             try:
-                self.websocket = await wss.connect(uri)
+                self.websocket = await wss.connect(uri, extra_headers=extra_headers)
                 self.connected = True
                 print("Connected")
                 return
@@ -57,7 +58,7 @@ class Socket(object):
             self.connected = False
             print("Disconnected")
 
-    async def send_message(self, message):
+    async def send_message(self, message:Union[str, Dict]):
         """
         서버로 메시지를 전송
 
@@ -86,7 +87,7 @@ class Socket(object):
         else:
             print("Not connected")
 
-    async def handle_error(self, error):
+    async def handle_error(self, error:Exception):
         """
         오류를 처리
 
@@ -100,7 +101,7 @@ class Server(Socket):
     웹소켓 서버를 관리하는 클래스
     """
 
-    def __init__(self, host="localhost", port=8765, max_retries=5, retry_delay=2, message_handler=None):
+    def __init__(self, host:str="localhost", port:int=8765, max_retries:int=5, retry_delay:int=2, message_handler:Optional[callable]=None):
         """
         Server 클래스의 생성자
 
@@ -115,7 +116,7 @@ class Server(Socket):
         self.port = port
         self.message_handler = message_handler if message_handler else self.default_message_handler
 
-    def set_message_handler(self, message_handler):
+    def set_message_handler(self, message_handler:callable):
         """
         사용자 정의 메시지 핸들러를 설정
 
@@ -123,7 +124,7 @@ class Server(Socket):
         """
         self.message_handler = message_handler
 
-    async def process(self, websocket, path):
+    async def process(self, websocket:wss.WebSocketServerProtocol, path:str):
         """
         클라이언트로부터 메시지를 처리
 
@@ -146,7 +147,7 @@ class Server(Socket):
             self.connected = False
             self.websocket = None  # 연결 종료 시 websocket 해제
 
-    def default_message_handler(self, message):
+    def default_message_handler(self, message:str) -> Dict[str, str]:
         """
         기본 메시지 핸들러
 
@@ -177,7 +178,7 @@ class Client(Socket):
     웹소켓 클라이언트를 관리하는 클래스
     """
 
-    def __init__(self, uri="ws://localhost:8765", max_retries=5, retry_delay=2):
+    def __init__(self, uri:str, max_retries:int=5, retry_delay:int=2):
         """
         Client 클래스의 생성자
 
@@ -194,7 +195,7 @@ class Client(Socket):
         """
         await super().connect(self.uri)
 
-    async def send_message(self, message):
+    async def send_message(self, message:Union[str, Dict]):
         """
         서버로 메시지를 전송
 
@@ -222,7 +223,7 @@ class Client(Socket):
         await self.connect()
 
 
-async def setup_socket(socket: Union[Server, Client]):
+async def setup_socket(socket:Union[Server, Client]) -> tuple:
     """
     소켓을 설정
 
@@ -255,7 +256,7 @@ async def unittest():
     """
     유닛 테스트 함수
     """
-    def custom_message_handler(message):
+    def custom_message_handler(message:str) -> Dict[str, str]:
         """
         사용자 정의 메시지 핸들러
 
@@ -265,7 +266,7 @@ async def unittest():
         return {"custom_processed": message[::-1]}
 
     server = Server()
-    client = Client()
+    client = Client(uri="ws://localhost:8765")
 
     loop_server, server_task = await setup_socket(server)
     loop_client, client_task = await setup_socket(client)
@@ -292,7 +293,7 @@ async def unittest2():
     유닛 테스트 함수 2
     """
     server = Server()
-    client = Client()
+    client = Client(uri="ws://localhost:8765")
 
     loop_server, server_task = await setup_socket(server)
     loop_client, client_task = await setup_socket(client)
