@@ -254,75 +254,54 @@ class AlphabetCoder:
     """
 
     @staticmethod
-    def encode(text: str) -> str:
+    def transform(text: str, encode: bool = True) -> str:
         """
-        주어진 문자열의 각 문자를 다음 문자로 변환합니다.
+        주어진 문자열의 각 문자를 변환합니다.
         소문자는 'a'에서 'z'까지 순환하며, 대문자는 'A'에서 'Z'까지 순환합니다.
         숫자는 '0'에서 '9'까지 순환합니다. 알파벳이나 숫자가 아닌 문자는 그대로 유지됩니다.
+        encode가 True이면 인코딩, False이면 디코딩을 수행합니다.
+
+        Args:
+            text (str): 변환할 문자열
+            encode (bool): 인코딩 여부 (기본값: True)
+
+        Returns:
+            str: 변환된 문자열
+        """
+        shift = 1 if encode else -1
+        return ''.join(
+            chr((ord(char) - ord('a') + shift) % 26 + ord('a')) if 'a' <= char <= 'z' else
+            chr((ord(char) - ord('A') + shift) % 26 + ord('A')) if 'A' <= char <= 'Z' else
+            chr((ord(char) - ord('0') + shift) % 10 + ord('0')) if '0' <= char <= '9' else
+            char
+            for char in text
+        )
+
+    @staticmethod
+    def encode(text: str) -> str:
+        """
+        주어진 문자열을 인코딩합니다.
 
         Args:
             text (str): 변환할 문자열
 
         Returns:
-            str: 변환된 문자열
+            str: 인코딩된 문자열
         """
-        result = []
-        
-        for char in text:
-            # 소문자일 경우
-            if 'a' <= char <= 'z':
-                # z일 경우 a로
-                new_char = chr((ord(char) - ord('a') + 1) % 26 + ord('a'))
-            # 대문자일 경우
-            elif 'A' <= char <= 'Z':
-                # Z일 경우 A로
-                new_char = chr((ord(char) - ord('A') + 1) % 26 + ord('A'))
-            # 숫자일 경우
-            elif '0' <= char <= '9':
-                new_char = chr((ord(char) - ord('0') + 1) % 10 + ord('0'))        
-            else:
-                # 알파벳이 아닌 경우 그대로 유지
-                new_char = char
-            
-            result.append(new_char)
-        
-        return ''.join(result)
+        return AlphabetCoder.transform(text, encode=True)
 
     @staticmethod
     def decode(text: str) -> str:
         """
-        주어진 텍스트의 각 문자를 알파벳 순서에서 이전 문자로 변환합니다.
-        소문자일 경우 'a'는 'z'로, 대문자일 경우 'A'는 'Z'로 변환됩니다.
-        숫자일 경우 '0'은 '9'로 변환됩니다.
-        알파벳이나 숫자가 아닌 문자는 그대로 유지됩니다.
+        주어진 문자열을 디코딩합니다.
 
         Args:
-            text (str): 변환할 텍스트 문자열.
+            text (str): 변환할 문자열
 
         Returns:
-            str: 변환된 텍스트 문자열.
+            str: 디코딩된 문자열
         """
-        result = []
-        
-        for char in text:
-            # 소문자일 경우
-            if 'a' <= char <= 'z':
-                # a일 경우 z로
-                new_char = chr((ord(char) - ord('a') - 1) % 26 + ord('a'))
-            # 대문자일 경우
-            elif 'A' <= char <= 'Z':
-                # A일 경우 Z로
-                new_char = chr((ord(char) - ord('A') - 1) % 26 + ord('A'))
-            # 숫자일 경우
-            elif '0' <= char <= '9':
-                new_char = chr((ord(char) - ord('0') - 1) % 10 + ord('0'))        
-            else:
-                # 알파벳이 아닌 경우 그대로 유지
-                new_char = char
-            
-            result.append(new_char)
-        
-        return ''.join(result)
+        return AlphabetCoder.transform(text, encode=False)
 
 
 #

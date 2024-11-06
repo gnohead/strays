@@ -10,7 +10,7 @@ from .roots import ROOT, Path
 from .logger import get_loggers
 from . import tools
 from .tools import load_json
-from . import time_and_date
+from . import datetime_tools
 from . import sockets
 
 print, error = get_loggers()
@@ -21,7 +21,7 @@ __all__ = [
     "Path",
     "ROOT",
     "tools",
-    "time_and_date",
+    "datetime_tools",
     "load_json",
     "sockets"
 ]
