@@ -59,36 +59,41 @@ class Socket(object):
             self.connected = False
             print("Disconnected")
 
-    async def send_message(self, message:Union[str, Dict]):
+    async def send_message(self, message:Union[str, Dict], timeout:Optional[int]=None):
         """
         서버로 메시지를 전송
 
         :param message: 전송할 메시지
+        :param timeout: 타임아웃 시간 (초)
         """
         if self.connected:
-            await self.websocket.send(json.dumps(message))
+            try:
+                await asyncio.wait_for(self.websocket.send(json.dumps(message)), timeout)
+            except asyncio.TimeoutError:
+                print("Send message timed out")
         else:
             print("Not connected")
 
-    async def receive_message(self):
+    async def receive_message(self, timeout:Optional[int]=None):
         """
         서버로부터 메시지를 수신
 
+        :param timeout: 타임아웃 시간 (초)
         :return: 수신한 메시지 (JSON 형식)
         """
         if self.connected:
             try:
-                message = await self.websocket.recv()
+                message = await asyncio.wait_for(self.websocket.recv(), timeout)
                 return json.loads(message)
-            
+            except asyncio.TimeoutError:
+                print("Receive message timed out")
+                return None
             except wss.ConnectionClosedOK:
                 print("Connection closed normally")
                 return None
-            
             except Exception as e:
                 await self.handle_error(e)
                 return None
-            
         else:
             print("Not connected")
 
@@ -232,21 +237,23 @@ class Client(Socket):
         """
         await super().connect(self.uri, extra_headers=extra_headers)
 
-    async def send_message(self, message:Union[str, Dict]):
+    async def send_message(self, message:Union[str, Dict], timeout:Optional[int]=None):
         """
         서버로 메시지를 전송
 
         :param message: 전송할 메시지
+        :param timeout: 타임아웃 시간 (초)
         """
-        await super().send_message(message)
+        await super().send_message(message, timeout)
 
-    async def receive_message(self):
+    async def receive_message(self, timeout:Optional[int]=None):
         """
         서버로부터 메시지를 수신
 
+        :param timeout: 타임아웃 시간 (초)
         :return: 수신한 메시지
         """
-        response = await super().receive_message()
+        response = await super().receive_message(timeout)
 
         if response:
             print(f"Received from server: {response}")
