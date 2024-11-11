@@ -16,7 +16,7 @@ configurations
 
 from pydantic import BaseModel
 
-from .roots import Path, ROOT, ROOT_APPDATA
+from roots import Path, ROOT, ROOT_APPDATA
 
 
 #

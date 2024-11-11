@@ -98,32 +98,21 @@ def is_dev() -> bool:
     return "dev" == get_git_branch()
 
 
-def gen_uuid() -> uuid.UUID:
+def gen_uuid(hashed: bool = False) -> str:
     """
-    UUID를 생성합니다.
+    UUID를 생성하고 선택적으로 SHA-256 해시를 반환합니다.
+
+    Parameters:
+        hashed (bool, optional): 해시 여부. 기본값은 False입니다.
 
     Returns:
-        uuid.UUID: 생성된 UUID
+        str: 생성된 UUID 또는 SHA-256 해시 문자열
     """
-    return uuid.uuid4()
-
-
-def hash_uuid() -> str:
-    """
-    UUID를 생성하고 SHA-256 해시를 반환합니다.
-
-    Returns:
-        str: SHA-256 해시 문자열
-    """
-    # UUID 생성
     uuid_obj = uuid.uuid4()
-    # UUID를 문자열로 변환
-    uuid_str = str(uuid_obj)
-    # SHA-256 해시 생성
-    sha256_hash = hashlib.sha256(uuid_str.encode())
-    # 해시를 16진수 문자열로 변환
-    hash_str = sha256_hash.hexdigest()
-    return hash_str
+    if hashed:
+        sha256_hash = hashlib.sha256(str(uuid_obj).encode())
+        return sha256_hash.hexdigest()
+    return str(uuid_obj)
 
 
 def gen_key(length: int = 64) -> str:
@@ -144,7 +133,7 @@ def gen_key(length: int = 64) -> str:
     m6 = { 'a': 'A', 'b': 'B', 'c': 'C', 'd': 'D', 'e': 'E', 'f': 'F', 'g': 'G', 'h': 'H', 'i': 'I', 'j': 'J' }
     m7 = { 'k': 'K', 'l': 'L', 'm': 'M', 'n': 'N', 'o': 'O', 'p': 'P', 'q': 'Q', 'r': 'R', 's': 'S', 't': 'T' }
 
-    hash_string = hash_uuid()
+    hash_string = gen_uuid(hashed=True)
     output_str = ''.join(random.choice([m1, m2, m3, m4, m5, m6, m7]).get(char, char) for char in hash_string)
 
     return ''.join(random.choice(output_str) for _ in range(length))
