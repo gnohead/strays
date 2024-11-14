@@ -28,10 +28,11 @@ from pathlib import Path
 from dotenv import dotenv_values
 from datetime import datetime, timedelta
 from pytz import timezone, BaseTzInfo
-from typing import List, Any, Tuple, Dict, Generator
+from typing import List, Any, Tuple, Dict, Generator, Union
 
 from pydantic import create_model, BaseModel
- 
+
+
 def create_model_from_data(name: str, data: Dict[str, Any]) -> BaseModel:
     """
     주어진 데이터로부터 Pydantic 모델을 생성합니다.
@@ -45,6 +46,20 @@ def create_model_from_data(name: str, data: Dict[str, Any]) -> BaseModel:
     """
     NewModel = create_model(name, **{key: (type(value), ...) for key, value in data.items()})
     return NewModel(**data)
+
+
+def create_model_from_json(name:str, jsontext:str) -> BaseModel:
+    """
+    주어진 json으로부터 Pydantic 모델을 생성합니다.
+
+    Parameters:
+        name (str): 모델의 이름
+        jsontext (str): 모델을 구성할 json 문자열
+
+    Returns:
+        BaseModel: 생성된 Pydantic 모델 인스턴스
+    """
+    return create_model_from_data(name=name, data=json.loads(jsontext))
 
 
 def load_json(filepath: Path) -> BaseModel:
@@ -509,6 +524,31 @@ def gen_date_past(n_days: int, fmt_str: str = "%Y%m%d") -> Generator[str, None, 
         current_date -= timedelta(days=1)
 
 
+#
+# 기타기능
+#
+def s2i(text:str) -> Union[int, str]:
+    try:
+        return int(text)
+    except ValueError:
+        return text
+
+def s2f(text:str) -> Union[float, str]:
+    try:
+        return float(text)
+    except ValueError:
+        return text
+    
+def s2num(text:str) -> Union[int, float, str]:
+    try:
+        return int(text)
+    except ValueError:
+        try:
+            return float(text)
+        except ValueError:
+            return text
+
+
 
 #
 # unittest
@@ -530,9 +570,14 @@ def unittest2():
     branch_name = get_git_branch()
     print(branch_name)
 
+def unittest3():
+    print(s2num("123"))
+    print(s2num("123ask123"))
+
 if __name__ == "__main__":
     from __init__ import print
 
     unittest()
     unittest2()
+    unittest3()
     print("done.")
