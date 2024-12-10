@@ -12,12 +12,12 @@ if _path not in sys.path:
     sys.path.append(_path)
 
 from roots import ROOT, Path
-from logger import get_loggers
+from logger import get_logger
 import tools
 from tools import load_json
 import sockets
 
-print, error = get_loggers()
+print, error = get_logger()
 
 __all__ = [
     "print",

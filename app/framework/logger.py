@@ -4,7 +4,7 @@
 #
 # Author: gnohead
 # Created: 2024. 5.
-# Modified: 2024. 10.
+# Modified: 2024. 12.
 # 
 
 """
@@ -12,6 +12,7 @@ logger
 
 - 콘솔과 파일에 로그를 출력
 - print() 함수를 대체하여 편하게 로그를 기록하기 위함
+- IceCreamDebugger 도입!
 """
 
 import logging
@@ -22,6 +23,9 @@ from logging.handlers import RotatingFileHandler
 from pathlib import Path
 from pytz import timezone
 from typing import Tuple, Callable
+
+from icecream import install, ic, IceCreamDebugger
+install()
 
 
 #
@@ -44,7 +48,7 @@ def create_logger(logfolderpath:str, name:str):
     Path(logfolderpath).mkdir(parents=True, exist_ok=True)
 
     # 포맷터 설정; 로그의 출력 형식을 지정
-    log_format = "[%(asctime)s,%(msecs)03d::%(name)s::%(levelname)s] %(message)s"
+    log_format = "[%(asctime)s,%(msecs)03d::%(name)s] %(message)s"
     formatter = LocalTimeFormatter(log_format, datefmt="%Y-%m-%d %H:%M:%S")
 
     # 콘솔 핸들러
@@ -68,7 +72,7 @@ def create_logger(logfolderpath:str, name:str):
     return logging.getLogger(name)
 
 
-def get_loggers() -> Tuple[Callable]:
+def get_logger() -> IceCreamDebugger:
     from configurations import load
     
     configs = load()
@@ -78,23 +82,24 @@ def get_loggers() -> Tuple[Callable]:
     # 로거 오브젝트 생성
     log_printer = create_logger(logpath, appname)
 
-    # 호출한 파일의 정보를 얻음
-    caller_frame = inspect.stack(1)
-    
-    print = lambda obj: log_printer.info(obj)
-    error = lambda obj: log_printer.error(obj)
-
-    return (print, error)
+    ic.configureOutput(prefix="", outputFunction=log_printer.info)
+    return ic
 
 
 #
 # unittest
 # 
 def unittest():
-    print, error = get_loggers()
-
+    print = get_logger()
     print("abc")
-    error("def")
+    print()
+    
+    def test(text:str) -> str:
+        return "_".join(text)
+    
+    res = test(print("AAA"))
+    print(res)
+
 
 if __name__ == "__main__":
     unittest()
