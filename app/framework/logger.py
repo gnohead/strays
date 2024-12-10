@@ -45,7 +45,7 @@ def create_logger(logfolderpath:str, name:str):
     Path(logfolderpath).mkdir(parents=True, exist_ok=True)
 
     # 포맷터 설정; 로그의 출력 형식을 지정
-    log_format = "%(asctime)s.%(msecs)03d| %(message)s"
+    log_format = "%(asctime)s.%(msecs)03d|> %(message)s"
     formatter = LocalTimeFormatter(log_format, datefmt="%Y-%m-%d %H:%M:%S")
 
     # 콘솔 핸들러
@@ -80,7 +80,7 @@ def get_logger() -> IceCreamDebugger:
     log_printer = create_logger(logpath, appname)
 
     install()    
-    ic.configureOutput(prefix="", outputFunction=log_printer.info)
+    ic.configureOutput(prefix="\n", outputFunction=log_printer.info)
     return ic
 
 

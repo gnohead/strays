@@ -1,12 +1,6 @@
 #!python3
 #-*- coding: utf-8 -*-
 
-#
-# Author: gnohead
-# Created: 2024. 10.
-# Modified: 2024. 11.
-#
-
 import websockets as wss
 import asyncio
 import signal
@@ -31,7 +25,7 @@ class Socket(object):
         self.max_retries = max_retries
         self.retry_delay = retry_delay
 
-    async def connect(self, uri:str, extra_headers:Optional[Dict[str, str]]=None):
+    async def connect(self, uri:str, additional_headers:Optional[Dict[str, str]]=None, ping_interval=20, ping_timeout=10):
         """
         서버에 연결을 시도합니다.
 
@@ -42,7 +36,12 @@ class Socket(object):
 
         while retries < self.max_retries:
             try:
-                self.websocket = await wss.connect(uri, extra_headers=extra_headers)
+                self.websocket = await wss.connect(
+                        uri, 
+                        additional_headers=additional_headers, 
+                        ping_interval=ping_interval, 
+                        ping_timeout=ping_timeout
+                    )
                 self.connected = True
                 print("Connected")
                 return
@@ -158,6 +157,12 @@ class Socket(object):
             raise StopAsyncIteration
 
         return message
+    
+    async def ping(self):
+        """
+        서버에 ping 신호 전송
+        """
+        return self.websocket.ping()
 
 
 class Server(Socket):
@@ -254,11 +259,11 @@ class Client(Socket):
         super().__init__(max_retries, retry_delay)
         self.uri = uri
 
-    async def connect(self, extra_headers:Optional[Dict[str, str]]=None):
+    async def connect(self, additional_headers:Optional[Dict[str, str]]=None, ping_interval=20, ping_timeout=10):
         """
         서버에 연결합니다.
         """
-        await super().connect(self.uri, extra_headers=extra_headers)
+        await super().connect(self.uri, additional_headers=additional_headers, ping_interval=ping_interval, ping_timeout=ping_timeout)
 
     async def send(self, message:str, timeout:Optional[int]=None):
         """
@@ -276,18 +281,13 @@ class Client(Socket):
         :param timeout: 타임아웃 시간 (초)
         :return: 수신한 메시지
         """
-        response = await super().receive(timeout)
-
-        if response:
-            print(f"Received from server: {response}")
-            
-        return response
+        return await super().receive(timeout)           
 
     async def start(self, extra_headers:Optional[Dict[str, str]]=None):
         """
         클라이언트를 시작합니다.
         """
-        await self.connect(extra_headers=extra_headers)
+        await self.connect(additional_headers=extra_headers)
 
 
 #
