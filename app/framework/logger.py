@@ -23,7 +23,6 @@ from pathlib import Path
 from pytz import timezone
 
 from icecream import install, ic, IceCreamDebugger
-install()
 
 
 #
@@ -46,7 +45,7 @@ def create_logger(logfolderpath:str, name:str):
     Path(logfolderpath).mkdir(parents=True, exist_ok=True)
 
     # 포맷터 설정; 로그의 출력 형식을 지정
-    log_format = "[%(asctime)s,%(msecs)03d::%(name)s] %(message)s"
+    log_format = "%(asctime)s.%(msecs)03d| %(message)s"
     formatter = LocalTimeFormatter(log_format, datefmt="%Y-%m-%d %H:%M:%S")
 
     # 콘솔 핸들러
@@ -80,6 +79,7 @@ def get_logger() -> IceCreamDebugger:
     # 로거 오브젝트 생성
     log_printer = create_logger(logpath, appname)
 
+    install()    
     ic.configureOutput(prefix="", outputFunction=log_printer.info)
     return ic
 
@@ -95,7 +95,8 @@ def unittest():
     def test(text:str) -> str:
         return "_".join(text)
     
-    res = test(print("AAA"))
+    A = "AAA"
+    res = test(print(A))
     print(res)
 
 

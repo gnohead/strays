@@ -1,8 +1,8 @@
 #!python3
 #-*- coding: utf-8 -*-
 
-from framework import error, print
+from framework import print
 
 if __name__ == "__main__":
-    error("this is the test!!!")
+    print("this is the test!!!")
     print("done.")

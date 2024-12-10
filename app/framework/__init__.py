@@ -17,11 +17,10 @@ import tools
 from tools import load_json
 import sockets
 
-print, error = get_logger()
+print = get_logger()
 
 __all__ = [
     "print",
-    "error",
     "Path",
     "ROOT",
     "tools",
