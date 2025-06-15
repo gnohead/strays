@@ -437,16 +437,16 @@ def gen_timestamp(fmt: str = "%Y%m%d%H%M%S%f") -> str:
 
 def get_now(fmt: str = "%Y-%m-%d %H:%M:%S.%f", ofs: int = 3) -> str:
     """
-    현재 시간을 지정된 형식으로 반환하고, 마지막 ofs 문자를 반환
+    현재 시간을 지정된 형식으로 반환하고, 마지막 ``ofs`` 문자들을 리턴합니다.
 
     Args:
-        fmt (str): 시간 형식 (기본값: "%Y-%m-%d %H:%M:%S.%f")
-        ofs (int): 반환할 마지막 문자 수 (기본값: 3)
+        fmt (str): 시간 형식 (기본값: ``"%Y-%m-%d %H:%M:%S.%f"``)
+        ofs (int): 뒤에서 가져올 문자 수 (기본값: ``3``)
 
     Returns:
-        str: 형식화된 현재 시간의 마지막 ofs 문자
+        str: 형식화된 현재 시간에서 끝 ``ofs`` 글자
     """
-    return gen_timestamp(fmt)[-ofs]
+    return gen_timestamp(fmt)[-ofs:]
 
 
 def get_date_interval(after_days: int, date_format: str = "%Y%m%d") -> Tuple[str, str]:
